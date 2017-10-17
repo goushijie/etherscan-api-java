@@ -1,8 +1,9 @@
 package com.tenshun.app;
 
 import com.google.common.collect.Lists;
+import com.tenshun.app.core.AccountData;
+import com.tenshun.app.core.Accounts;
 import com.tenshun.app.core.WalletParser;
-import com.tenshun.app.core.WalletData;
 import com.tenshun.app.utils.Constants;
 
 import java.io.IOException;
@@ -19,13 +20,13 @@ public class Application {
     public static void main(String[] args) throws IOException {
         if (args.length == 1) {
             String filePath = Constants.RESOURCE_PATH + args[0];
-            List<String> walletsIDs = WalletParser.extractWalletIdsFromFile(filePath);
-            Map<String, WalletData> result = new HashMap<>();
+            List<String> walletsIDs = Accounts.extractWalletIdsFromFile(filePath);
+            Map<String, AccountData> result = new HashMap<>();
             List<List<String>> chunks = Lists.partition(walletsIDs, 20);
 
             //make ~13 parallel HTTP calls (20 addresses in each call) instead of 270 calls
             chunks.parallelStream().forEach(chunk -> {
-                Map<String, WalletData> chunkResult = WalletParser.getWalletBalancesByAddresses(chunk);
+                Map<String, AccountData> chunkResult = Accounts.getEtherBalancesFromMultipleAddresses(chunk);
                 //result.
 
             });

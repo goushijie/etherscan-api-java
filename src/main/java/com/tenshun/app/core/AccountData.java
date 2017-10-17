@@ -6,7 +6,7 @@ import java.util.List;
 
 
 
-public class WalletData {
+public class AccountData {
 
     private String walletId;
     private BigDecimal balance;
@@ -34,5 +34,29 @@ public class WalletData {
 
     public void setTransactions(List<String> transactions) {
         this.transactions = transactions;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AccountData that = (AccountData) o;
+
+        return walletId.equals(that.walletId);
+    }
+
+    @Override
+    public int hashCode() {
+        return walletId.hashCode();
+    }
+
+    @Override //todo maybe delete later
+    public String toString() {
+        return "AccountData{" +
+                "walletId='" + walletId + '\'' +
+                ", balance=" + balance +
+                ", transactions=" + transactions +
+                '}';
     }
 }
