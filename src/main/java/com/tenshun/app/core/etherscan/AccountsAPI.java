@@ -1,7 +1,8 @@
-package com.tenshun.app.core;
+package com.tenshun.app.core.etherscan;
 
 
 import com.sun.istack.internal.NotNull;
+import com.tenshun.app.core.ether.Account;
 import com.tenshun.app.utils.Constants;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -14,7 +15,10 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Accounts {
+public class AccountsAPI {
+
+    private AccountsAPI() {
+    }
 
     private OkHttpClient client = new OkHttpClient();
 
@@ -26,21 +30,9 @@ public class Accounts {
      * @param addresses eth wallet addresses
      * @return Empty Map if list of addresses is also empty, or List of Balances otherwise todo
      * @throws InvalidEthereumAddressException if one of the addresses is invalid todo
-     * <p>
-     * <p>
-     * <p>
-     * RESPONSE:
-     * {"status":"1",
-     * "message":"OK",
-     * "result":[
-     * {"account":"0xddbd2b932c763ba5b1b7ae3b362eac3e8d40121a","balance":"40807168564070000000000"},
-     * {"account":"0x63a9975ba31b0b9626b34300f7f627147df1f526","balance":"332567136222827062478"},
-     * {"account":"0x198ef1ec325a96cc354c7266a038be8b5c558f67","balance":"413626250239783867852"}]
-     * }
      */
 
-
-    public static Map<String, AccountData> getEtherBalancesFromMultipleAddresses(@NotNull List<String> addresses) {
+    public static Map<String, Account> getEtherBalancesFromMultipleAddresses(@NotNull List<String> addresses) {
         if (!addresses.isEmpty()) {
             String finalURL = buildEthBalanceURL(addresses);
             HttpUrl.Builder urlBuilder = HttpUrl.parse(finalURL).newBuilder();
@@ -55,7 +47,7 @@ public class Accounts {
             //todo make HTTP call to finalURL
             //todo parse json with jackson
             //todo convert result to HashMap as efficient as possible
-            Map<String, AccountData> result = new HashMap<>();
+            Map<String, Account> result = new HashMap<>();
 
             return result;
         } else return Collections.emptyMap();
@@ -75,55 +67,35 @@ public class Accounts {
     }
 
 
-    /**
-     * Get a list of 'Normal' Transactions By Address
-     * <p>
-     * [Optional Parameters] startblock: starting blockNo to retrieve results, endblock: ending blockNo to retrieve results
-     * <p>
-     * http://api.etherscan.io/api?module=account&action=txlist&address=0xddbd2b932c763ba5b1b7ae3b362eac3e8d40121a&startblock=0&endblock=99999999&sort=asc&apikey=YourApiKeyToken
-     * ([BETA] Returned 'isError' values: 0=No Error, 1=Got Error)
-     * (Returns up to a maximum of the last 10000 transactions only)
-     * <p>
+    /** todo
+     * Get list of Blocks Mined by Address
+     * https://api.etherscan.io/api?module=account&action=getminedblocks&address=0x9dd134d14d1e65f84b706d6f205cd5b1cd03a46b&blocktype=blocks&apikey=YourApiKeyToken
      * or
-     * <p>
-     * https://api.etherscan.io/api?module=account&action=txlist&address=0xddbd2b932c763ba5b1b7ae3b362eac3e8d40121a&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=YourApiKeyToken
+     * https://api.etherscan.io/api?module=account&action=getminedblocks&address=0x9dd134d14d1e65f84b706d6f205cd5b1cd03a46b&blocktype=blocks&page=1&offset=10&apikey=YourApiKeyToken
      * (To get paginated results use page=<page number> and offset=<max records to return>)
-     *
-     * @param address Ethereum address
-     * @return List of 'Normal' transactions
+     * * type = blocks (full blocks only) or uncles (uncle blocks only)
      */
-
-
-    public static List<String> getListOfNormalTranscationsByAddress(String address) {
-        return Collections.emptyList();
-    }
-
-    public static List<String> getListOfTransactions(List<String> addresses) {
-        return Collections.emptyList(); //mock
-    }
-
-
-    public static List<String> extractWalletIdsFromFile(String filePath) throws IOException {
-        return Files.lines(Paths.get(filePath))
-                .flatMap(post -> Arrays.stream(post.split("\\s+")))
-                .filter(splitted -> splitted.contains("0x") && splitted.length() == 42)
-                .collect(Collectors.toList());
-    }
 
 
     /**
      * Concatenation of chunk ethereum addresses in one single ready for call URL
+     * <p>
+     * Constraints:
+     * - size > 0 && size <= 20
      *
      * @param addresses List of ethereum addresses
      * @return URL https://api.etherscan.io/api?module=account&action=balancemulti&address=0xddbd2b932c763ba5b1b7ae3b362eac3e8d40121a,0x63a9975ba31b0b9626b34300f7f627147df1f526,0x198ef1ec325a96cc354c7266a038be8b5c558f67&tag=latest&apikey=YourApiKeyToken
      */
-    private static String buildEthBalanceURL(List<String> addresses) {
-        StringBuilder sb = new StringBuilder("https://api.etherscan.io/api?module=account&action=balancemulti&");
-        for (String currentAddress : addresses) {
-            sb.append(currentAddress);
-            sb.append(",");
-        }
-        return sb.append("&tag=latest&apikey=")
-                .append(Constants.API_KEY).toString();
+    public static String buildEthBalanceURL(@NotNull List<String> addresses) {
+        if (!addresses.isEmpty() && addresses.size() <= 20) {
+            StringBuilder sb = new StringBuilder("https://api.etherscan.io/api?module=account&action=balancemulti&address=");
+            if (addresses.size() == 1) {
+                sb.append(addresses.get(0));
+            } else {
+                sb.append(String.join(",", addresses));
+            }
+            return sb.append("&tag=latest&apikey=")
+                    .append(Constants.API_KEY).toString();
+        } else throw new IllegalArgumentException("Empty addresses list, must be at least 1 and less or equal than 20");
     }
 }
