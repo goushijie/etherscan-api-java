@@ -8,12 +8,8 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class AccountsAPI {
 
@@ -86,8 +82,8 @@ public class AccountsAPI {
      * @param addresses List of ethereum addresses
      * @return URL https://api.etherscan.io/api?module=account&action=balancemulti&address=0xddbd2b932c763ba5b1b7ae3b362eac3e8d40121a,0x63a9975ba31b0b9626b34300f7f627147df1f526,0x198ef1ec325a96cc354c7266a038be8b5c558f67&tag=latest&apikey=YourApiKeyToken
      */
-    public static String buildEthBalanceURL(@NotNull List<String> addresses) {
-        if (addresses.isEmpty()) {
+    public static String buildEthBalanceURL(@NotNull Collection<String> addresses) {
+        if (addresses == null || addresses.isEmpty()) {
             throw new IllegalArgumentException("Empty addresses list, must be at least 1");
         }
         if (addresses.size() > 20) {
