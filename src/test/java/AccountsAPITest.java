@@ -29,7 +29,7 @@ public class AccountsAPITest {
     @Test()
     public void testThatThrowsInvalidArgumentIfMoreThanTwelve() {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Empty addresses list, must be at least 1 and less or equal than 20");
+        thrown.expectMessage("Maximum size of addresses list is 20");
         List<String> addrList = new ArrayList<>();
         IntStream.range(0, 100).forEach(n -> addrList.add(String.valueOf(n)));
         String resultURL = AccountsAPI.buildEthBalanceURL(addrList);
@@ -38,7 +38,7 @@ public class AccountsAPITest {
     @Test()
     public void testThatThrowsInvalidArgumentIfLessThanOne() {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Empty addresses list, must be at least 1 and less or equal than 20");
+        thrown.expectMessage("Empty addresses list, must be at least 1");
         List<String> addrList = new ArrayList<>();
         String resultURL = AccountsAPI.buildEthBalanceURL(addrList);
     }
