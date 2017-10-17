@@ -89,11 +89,7 @@ public class AccountsAPI {
     public static String buildEthBalanceURL(@NotNull List<String> addresses) {
         if (!addresses.isEmpty() && addresses.size() <= 20) {
             StringBuilder sb = new StringBuilder("https://api.etherscan.io/api?module=account&action=balancemulti&address=");
-            if (addresses.size() == 1) {
-                sb.append(addresses.get(0));
-            } else {
-                sb.append(String.join(",", addresses));
-            }
+            sb.append(String.join(",", addresses));
             return sb.append("&tag=latest&apikey=")
                     .append(Constants.API_KEY).toString();
         } else throw new IllegalArgumentException("Empty addresses list, must be at least 1 and less or equal than 20");
