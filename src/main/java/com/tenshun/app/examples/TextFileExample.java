@@ -1,4 +1,4 @@
-package com.tenshun.app;
+package com.tenshun.app.examples;
 
 import com.google.common.collect.Lists;
 import com.tenshun.app.core.ether.Account;
@@ -12,10 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 
-/**
- * Powered by Etherscan.io APIs
- */
-public class Application {
+public class TextFileExample {
 
     /**
      * @param args arg[0] - path to txt file. Only one param currently supported
@@ -24,9 +21,8 @@ public class Application {
     public static void main(String[] args) throws IOException {
         if (args.length == 1) {
             String filePath = Constants.RESOURCE_PATH + args[0];
-            List<String> walletsIDs = FileUtils.extractAddressesFromFile(filePath);
-            Map<String, Account> result = new HashMap<>();
-            List<List<String>> chunks = Lists.partition(walletsIDs, 20);
+            List<String> addresses = FileUtils.extractAddressesFromFile(filePath);
+            List<List<String>> chunks = Lists.partition(addresses, 20);
 
             //make ~13 parallel HTTP calls (20 addresses in each call) instead of 270 calls
             chunks.parallelStream().forEach(chunk -> {
