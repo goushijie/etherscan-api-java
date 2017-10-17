@@ -16,6 +16,9 @@ public class AccountsAPI {
     private AccountsAPI() {
     }
 
+
+    private static final String BASE_URL = "https://api.etherscan.io/api?module=account&action=";
+
     private OkHttpClient client = new OkHttpClient();
 
     /**
@@ -89,8 +92,14 @@ public class AccountsAPI {
         if (addresses.size() > 20) {
             throw new IllegalArgumentException("Maximum size of addresses list is 20");
         }
-        StringBuilder sb = new StringBuilder("https://api.etherscan.io/api?module=account&action=balancemulti&address=");
-        sb.append(String.join(",", addresses));
-        return sb.append("&tag=latest&apikey=").append(Constants.API_KEY).toString();
+        StringBuilder balanceURL = new StringBuilder(BASE_URL);
+
+        if(addresses.size() == 1) {
+            balanceURL.append("balance&");
+        } else balanceURL.append("balancemulti&");
+
+        balanceURL.append("&address=");
+        balanceURL.append(String.join(",", addresses));
+        return balanceURL.append("&tag=latest&apikey=").append(Constants.API_KEY).toString();
     }
 }

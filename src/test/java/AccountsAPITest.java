@@ -50,4 +50,19 @@ public class AccountsAPITest {
         String testString = "https://api.etherscan.io/api?module=account&action=balancemulti&address=1&tag=latest&apikey=" + Constants.API_KEY;
         Assert.assertEquals(testString, resultURL);
     }
+
+
+    @Test
+    public void testThatURLContainsArgForSingleAddress() {
+        List<String> addrList = Arrays.asList("1");
+        String resultURL = AccountsAPI.buildEthBalanceURL(addrList);
+        Assert.assertTrue(!resultURL.contains("balancemulti") && resultURL.contains("balance"));
+    }
+
+    @Test
+    public void testThatURLContainsArgForMultiAddress() {
+        List<String> addrList = Arrays.asList("1", "2", "3");
+        String resultURL = AccountsAPI.buildEthBalanceURL(addrList);
+        Assert.assertTrue(resultURL.contains("balancemulti"));
+    }
 }
